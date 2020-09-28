@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/weiqiang333/infra-skywalking-webhook/internal/dingtalk"
+	"github.com/weiqiang333/infra-skywalking-webhook/internal/weixin"
 )
-
 
 // Web 路由入口
 func Web() {
@@ -20,15 +20,17 @@ func Web() {
 			"message": "OK",
 		})
 	})
+
 	r.POST("/dingtalk", routerDingtalk)
+	r.POST("/weixin", routerWeixin)
+
 	err := r.Run(viper.GetString("address")) // listen and serve on 0.0.0.0:8080
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 }
 
-
-func routerDingtalk(c *gin.Context)  {
+func routerDingtalk(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error Body": err.Error()})
@@ -37,6 +39,21 @@ func routerDingtalk(c *gin.Context)  {
 	err = dingtalk.Dingtalk(data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error dingtalk": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"INFO": fmt.Sprint(c.Request, c.Request.Header)})
+	return
+}
+
+func routerWeixin(c *gin.Context) {
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error Body": err.Error()})
+		return
+	}
+	err = weixin.Weixin(data)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error weixin": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"INFO": fmt.Sprint(c.Request, c.Request.Header)})
