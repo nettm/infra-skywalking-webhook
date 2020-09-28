@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -34,7 +35,7 @@ type message struct {
 	Id0          int
 	Id1          int
 	AlarmMessage string
-	StartTime    int
+	StartTime    int64
 }
 
 // Weixin 发送企业微信消息体
@@ -76,13 +77,18 @@ Item values:
 func createContent(message []message) (string, string) {
 	var alertname bytes.Buffer
 	var alertSummary bytes.Buffer
+
 	for i, alert := range message {
-		alertname.WriteString(fmt.Sprintf("%s,id: %d,time: %d\n", alert.Name, alert.Id0, alert.StartTime))
+		if i > 0 {
+			alertname.WriteString("\n\n")
+		}
+
+		timestamp := formatTime(alert.StartTime)
+		alertname.WriteString(fmt.Sprintf("应用名: %s\n报警时间: %s\n报警号: %d\n报警内容: %s", alert.Name, timestamp, alert.Id0, alert.AlarmMessage))
 		alertSummary.WriteString(fmt.Sprintf("%b,%s\n", i, alert.AlarmMessage))
 	}
 
-	contents := fmt.Sprintf(`Skywalking告警: \n%s\n告警内容:\n%s`,
-		alertname.String(), alertSummary.String())
+	contents := fmt.Sprintf("Skywalking告警: \n%s", alertname.String())
 	data := fmt.Sprintf(`{
         "msgtype": "text",
             "text": {
@@ -90,4 +96,9 @@ func createContent(message []message) (string, string) {
         }
     }`, contents)
 	return data, alertSummary.String()
+}
+
+func formatTime(timestamp int64) string {
+	tm := time.Unix(timestamp/1000, 0)
+	return tm.Format("2006-01-02 15:04:05")
 }
