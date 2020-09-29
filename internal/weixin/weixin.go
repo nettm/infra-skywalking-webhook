@@ -32,8 +32,8 @@ import (
 type message struct {
 	ScopeId      int
 	Name         string
-	Id0          int
-	Id1          int
+	Id0          string
+	Id1          string
 	AlarmMessage string
 	StartTime    int64
 }
@@ -84,7 +84,7 @@ func createContent(message []message) (string, string) {
 		}
 
 		timestamp := formatTime(alert.StartTime)
-		alertname.WriteString(fmt.Sprintf("应用名: %s\n报警时间: %s\n报警号: %d\n报警内容: %s", alert.Name, timestamp, alert.Id0, alert.AlarmMessage))
+		alertname.WriteString(fmt.Sprintf("应用名: %s\n报警时间: %s\n报警号: %s\n报警内容: %s", alert.Name, timestamp, alert.Id0, alert.AlarmMessage))
 		alertSummary.WriteString(fmt.Sprintf("%b,%s\n", i, alert.AlarmMessage))
 	}
 

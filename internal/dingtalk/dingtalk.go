@@ -29,14 +29,13 @@ import (
 }]
 */
 type message struct {
-	ScopeId int
-	Name string
-	Id0	int
-	Id1 int
-	AlarmMessage	string
-	StartTime	int
+	ScopeId      int
+	Name         string
+	Id0          string
+	Id1          string
+	AlarmMessage string
+	StartTime    int64
 }
-
 
 // Dingtalk 发送钉钉消息体
 func Dingtalk(data []byte) error {
@@ -56,7 +55,6 @@ func Dingtalk(data []byte) error {
 	log.Println(resp.StatusCode, alertSummary)
 	return nil
 }
-
 
 /*
 状态: notify
@@ -78,7 +76,7 @@ Item values:
 */
 func createContent(message []message) (string, string) {
 	grade := "P3"
-	description	:=	""
+	description := ""
 
 	var alertname bytes.Buffer
 	var alertSummary bytes.Buffer
