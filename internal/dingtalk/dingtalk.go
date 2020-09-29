@@ -31,8 +31,8 @@ import (
 type message struct {
 	ScopeId      int
 	Name         string
-	Id0          string
-	Id1          string
+	Id0          int
+	Id1          int
 	AlarmMessage string
 	StartTime    int64
 }
